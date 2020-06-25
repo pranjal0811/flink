@@ -40,6 +40,8 @@ public class ConfluentRegistryAvroDeserializationSchema<T> extends RegistryAvroD
 	private static final int DEFAULT_IDENTITY_MAP_CAPACITY = 1000;
 
 	private static final long serialVersionUID = -1671641202177852775L;
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ConfluentRegistryAvroDeserializationSchema.class);
 
 	/**
 	 * Creates a Avro deserialization schema.
@@ -114,6 +116,21 @@ public class ConfluentRegistryAvroDeserializationSchema<T> extends RegistryAvroD
 			new CachedSchemaCoderProvider(url, identityMapCapacity)
 		);
 	}
+	
+	/**
+	 * Overrides the deserialize method of RegistryAvroDeserializationSchema
+	 * Handles the exception while deserializing method 
+	 * @param message			  message to be deserialized
+	 * @return deserialized record
+	 */
+	@Override
+  	public T deserialize(byte[] message) throws IOException {
+    	try {
+      		return super.deserialize(message);
+    	}catch (Exception ex){
+      		LOG.warn(Messages.getString("Got exception in deserializing the record"),ex);
+      		return null;
+    }
 
 	private static class CachedSchemaCoderProvider implements SchemaCoder.SchemaCoderProvider {
 
